@@ -43,10 +43,6 @@ pub fn build(b: *std.Build) !void {
     raylib.installHeader("raygui/src/raygui.h", "raygui.h");
     exe.linkLibrary(raylib);
 
-    // TODO: the exe needs the headers too?
-    exe.installHeader("raylib/src/raylib.h", "raylib.h");
-    exe.installHeader("raygui/src/raygui.h", "raygui.h");
-
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
