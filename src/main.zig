@@ -18,6 +18,12 @@ pub fn main() !void {
     ray.SetTargetFPS(target_fps);
     defer ray.CloseWindow();
 
+    // Audio
+    ray.InitAudioDevice();
+    defer ray.CloseAudioDevice();
+    const sounds = ray.LoadSound("resources/clear.wav");
+    defer ray.UnloadSound(sounds);
+
     var game_manager = game.Manager{
         .board_pos = game.board_pos,
         .tablero = game.new_tablero(),
@@ -26,6 +32,7 @@ pub fn main() !void {
         },
         .tile_size_x = tile_size_x,
         .tile_size_y = tile_size_y,
+        .sounds = sounds,
     };
 
     // game loop

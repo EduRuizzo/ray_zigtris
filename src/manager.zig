@@ -91,6 +91,7 @@ pub const Manager = struct {
     frames_counter: u32 = 0,
     exit: bool = false,
     score: i64 = 0,
+    sounds: ray.Sound,
 
     pub fn reset(this: *This) !void {
         this.current_screen = .gameplay;
@@ -170,6 +171,8 @@ pub const Manager = struct {
         if (lines == 0) {
             return;
         }
+
+        ray.PlaySound(this.sounds);
 
         std.log.debug("LINES REMOVED: {}\n", .{lines});
         this.tablero.log_debug();
