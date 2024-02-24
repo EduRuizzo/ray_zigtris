@@ -1,24 +1,49 @@
 const std = @import("std");
 
+const ray = @cImport({
+    @cInclude("raylib.h");
+});
+
+const game = @import("manager.zig");
+
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    // initializations
+    const window_width = game.window_width;
+    const window_height = game.window_height;
+    const tile_size_x = game.tile_size_x;
+    const tile_size_y = game.tile_size_y;
+    const target_fps = game.target_fps;
 
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
+    ray.InitWindow(window_width, window_height, "Ray ZigTris");
+    ray.SetTargetFPS(target_fps);
+    defer ray.CloseWindow();
 
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
+    // Audio
+    ray.InitAudioDevice();
+    defer ray.CloseAudioDevice();
+    const sounds = ray.LoadSound("resources/clear.wav");
+    defer ray.UnloadSound(sounds);
 
-    try bw.flush(); // don't forget to flush!
-}
+    var game_manager = game.Manager{
+        .board_pos = game.board_pos,
+        .tablero = game.new_tablero(),
+        .camera = ray.Camera2D{
+            .zoom = 1,
+        },
+        .tile_size_x = tile_size_x,
+        .tile_size_y = tile_size_y,
+        .sounds = sounds,
+    };
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+    // game loop
+    while (!ray.WindowShouldClose() and !game_manager.exit) {
+        // UPDATE
+        try game_manager.update_screen();
+
+        // DRAW
+        ray.BeginDrawing();
+        ray.ClearBackground(ray.WHITE);
+        game_manager.draw_screen();
+        ray.EndDrawing();
+    }
 }
