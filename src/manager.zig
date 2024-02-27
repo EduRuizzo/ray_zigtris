@@ -96,6 +96,7 @@ pub const Manager = struct {
     pub fn reset(this: *This) !void {
         this.current_screen = .gameplay;
         this.game_state = .playing;
+        this.score = 0;
 
         this.gravity_period = start_gravity_period;
         this.tablero = new_tablero();
